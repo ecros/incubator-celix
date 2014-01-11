@@ -15,19 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-find_package(Jansson REQUIRED)
-
-include_directories(${JANSSON_INCLUDE_DIRS})
-include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/calculator_endpoint/private/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/calculator_service/public/include")
-
-bundle(org.example.api.Calculator_endpoint SOURCES 
-	private/src/calculator_endpoint_activator
-	private/src/calculator_endpoint_impl.c
-    
-    private/include/calculator_endpoint_impl.h
-)
-
-target_link_libraries(org.example.api.Calculator_endpoint celix_framework ${JANSSON_LIBRARIES})
+celix_subproject(RSA_BUNDLES_EXAMPLE "Option to enable building the Remote Service Admin Service Example bundles" OFF DEPS LAUNCHER topology_manager remote_service_admin)
+if (RSA_BUNDLES_EXAMPLE)
+    add_subdirectory(calculator_endpoint)
+    add_subdirectory(calculator_proxy)
+    add_subdirectory(calculator_service)
+    add_subdirectory(calculator_shell)
+endif (RSA_BUNDLES_EXAMPLE)

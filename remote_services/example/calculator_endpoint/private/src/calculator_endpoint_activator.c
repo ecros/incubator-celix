@@ -17,42 +17,46 @@
  *under the License.
  */
 /*
- * calculator_activator.c
+ * calculator_endpoint_activator.c
  *
- *  \date       Oct 5, 2011
+ *  \date       Oct 10, 2011
  *  \author    	<a href="mailto:celix-dev@incubator.apache.org">Apache Celix Project Team</a>
  *  \copyright	Apache License, Version 2.0
  */
 #include <stdlib.h>
 
 #include "bundle_activator.h"
-#include "bundle_context.h"
-#include "service_registration.h"
 
-#include "calculator_impl.h"
-#include "remote_constants.h"
+#include "calculator_endpoint_impl.h"
+#include "service_registration.h"
 
 struct activator {
 	apr_pool_t *pool;
-	service_registration_pt calculatorReg;
+
+	service_registration_pt endpoint;
 };
 
 celix_status_t bundleActivator_create(bundle_context_pt context, void **userData) {
 	celix_status_t status = CELIX_SUCCESS;
-	apr_pool_t *parentpool = NULL;
+
+	apr_pool_t *parentPool = NULL;
 	apr_pool_t *pool = NULL;
 	struct activator *activator;
 
-	status = bundleContext_getMemoryPool(context, &parentpool);
+	status = bundleContext_getMemoryPool(context, &parentPool);
 	if (status == CELIX_SUCCESS) {
-		if (apr_pool_create(&pool, parentpool) != APR_SUCCESS) {
+		if (apr_pool_create(&pool, parentPool) != APR_SUCCESS) {
 			status = CELIX_BUNDLE_EXCEPTION;
 		} else {
 			activator = apr_palloc(pool, sizeof(*activator));
-			activator->pool = pool;
-			activator->calculatorReg = NULL;
+			if (!activator) {
+				status = CELIX_ENOMEM;
+			} else {
+				activator->pool = pool;
+				activator->endpoint = NULL;
 
-			*userData = activator;
+				*userData = activator;
+			}
 		}
 	}
 
@@ -62,27 +66,17 @@ celix_status_t bundleActivator_create(bundle_context_pt context, void **userData
 celix_status_t bundleActivator_start(void * userData, bundle_context_pt context) {
 	celix_status_t status = CELIX_SUCCESS;
 	struct activator *activator = userData;
-	calculator_pt calculator = NULL;
-	calculator_service_pt service = NULL;
-	properties_pt properties = NULL;
+	remote_endpoint_pt endpoint = NULL;
+	remote_endpoint_service_pt endpointService = NULL;
 
-	status = calculator_create(activator->pool, &calculator);
-	if (status == CELIX_SUCCESS) {
-		service = apr_palloc(activator->pool, sizeof(*service));
-		if (!service) {
-			status = CELIX_ENOMEM;
-		} else {
-			service->calculator = calculator;
-			service->add = calculator_add;
-			service->sub = calculator_sub;
-			service->sqrt = calculator_sqrt;
+	calculatorEndpoint_create(activator->pool, &endpoint);
+	endpointService = apr_palloc(activator->pool, sizeof(*endpointService));
+	endpointService->endpoint = endpoint;
+	endpointService->handleRequest = calculatorEndpoint_handleRequest;
+	endpointService->setService = calculatorEndpoint_setService;
 
-			properties = properties_create();
-			properties_set(properties, (char *) SERVICE_EXPORTED_INTERFACES, (char *) CALCULATOR_SERVICE);
+	bundleContext_registerService(context, OSGI_RSA_REMOTE_ENDPOINT, endpointService, NULL, &activator->endpoint);
 
-			bundleContext_registerService(context, (char *) CALCULATOR_SERVICE, service, properties, &activator->calculatorReg);
-		}
-	}
 
 	return status;
 }
@@ -91,16 +85,12 @@ celix_status_t bundleActivator_stop(void * userData, bundle_context_pt context) 
 	celix_status_t status = CELIX_SUCCESS;
 	struct activator *activator = userData;
 
-	serviceRegistration_unregister(activator->calculatorReg);
+	serviceRegistration_unregister(activator->endpoint);
 
 	return status;
 }
 
 celix_status_t bundleActivator_destroy(void * userData, bundle_context_pt context) {
 	celix_status_t status = CELIX_SUCCESS;
-	struct activator *activator = userData;
-
-
-
 	return status;
 }

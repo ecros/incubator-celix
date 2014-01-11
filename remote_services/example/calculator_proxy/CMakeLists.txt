@@ -20,8 +20,8 @@ find_package(Jansson REQUIRED)
 include_directories(${JANSSON_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
 include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/calculator_proxy/private/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/calculator_service/public/include")
+include_directories("${PROJECT_SOURCE_DIR}/remote_services/example/calculator_proxy/private/include")
+include_directories("${PROJECT_SOURCE_DIR}/remote_services/example/calculator_service/public/include")
 include_directories("${PROJECT_SOURCE_DIR}/remote_services/endpoint_listener/public/include")
 
 bundle(org.example.api.Calculator_proxy SOURCES 

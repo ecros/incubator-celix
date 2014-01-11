@@ -59,10 +59,35 @@ properties_pt properties_load(char * filename) {
 
 		while ( fgets ( line, sizeof line, file ) != NULL ) {
 			if (!split) {
-				unsigned int pos = strcspn(line, "=");
+
+				unsigned int pos = 0;
+
+				// check if equal sign is escaped
+				do
+				{
+					pos++;
+					pos = (strcspn(line + pos, "=") + pos);
+				} while((pos != strlen(line)) && (line[pos-1] == '\\'));
+
 				if (pos != strlen(line)) {
 					char * ival = NULL;
+
+					// copy to key
 					key = utils_stringTrim(string_ndup((char *)line, pos));
+
+					// remove escaped equal signs
+					char* pstr = NULL;
+
+					do
+					{
+						if (pstr != NULL)
+						{
+							memmove(pstr, pstr+1, strlen(pstr) + 1) ;
+						}
+
+						pstr = strstr(key,"\\=");
+					} while (pstr != NULL);
+
 					ival = string_ndup(line+pos+1, strlen(line));
 					value = utils_stringTrim(ival);
 					if (value != NULL) {

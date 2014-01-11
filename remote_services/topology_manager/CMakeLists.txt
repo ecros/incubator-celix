@@ -15,22 +15,25 @@
 # specific language governing permissions and limitations
 # under the License.
 
-include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/topology_manager/private/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/endpoint_listener/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
+celix_subproject(RSA_BUNDLES_TOPOLOGY_MANAGER "Option to enable building the Topology Manager bundle" ON DEPS LAUNCHER)
+if (RSA_BUNDLES_TOPOLOGY_MANAGER)
+	include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/utils/public/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/topology_manager/private/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/endpoint_listener/public/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
 
-SET_HEADER(BUNDLE_SYMBOLICNAME "apache_celix_rs_topology_manager")
-SET_HEADERS("Bundle-Name: Apache Celix RS Topology Manager")
+	SET_HEADER(BUNDLE_SYMBOLICNAME "apache_celix_rs_topology_manager")
+	SET_HEADERS("Bundle-Name: Apache Celix RS Topology Manager")
 
-bundle(topology_manager SOURCES
-    private/src/topology_manager
-    private/src/activator
+	bundle(topology_manager SOURCES
+    	private/src/topology_manager
+	    private/src/activator
     
-    private/include/topology_manager.h
-)
+	    private/include/topology_manager.h
+	)
 
-install_bundle(topology_manager)
+	install_bundle(topology_manager)
 
-target_link_libraries(topology_manager celix_framework ${APRUTIL_LIBRARY})
+	target_link_libraries(topology_manager celix_framework ${APRUTIL_LIBRARY})
+endif (RSA_BUNDLES_TOPOLOGY_MANAGER)

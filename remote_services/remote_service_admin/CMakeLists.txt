@@ -15,17 +15,25 @@
 # specific language governing permissions and limitations
 # under the License.
 
-include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/calculator_service/private/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/calculator_service/public/include")
-
-bundle(calculator SOURCES 
-	private/src/calculator_impl
-	private/src/calculator_activator
-    
-    private/include/calculator_impl.h
+CELIX_ADD_COMPONENT(remote_service_admin
+    DISPLAY_NAME remote_service_admin
+    DESCRIPTION Public files needed for RSA implementations
+    GROUP bundles
 )
-
-target_link_libraries(calculator celix_framework)
+install (FILES 
+        public/include/remote_endpoint_impl.h
+        public/include/remote_endpoint.h
+        public/include/remote_proxy.h
+        public/include/remote_service_admin.h
+    DESTINATION 
+        include/celix/remote_service_admin 
+    COMPONENT 
+        remote_service_admin
+)
+install (FILES 
+        ${PROJECT_SOURCE_DIR}/remote_services/endpoint_listener/public/include/endpoint_listener.h
+    DESTINATION 
+        include/celix/endpoint_listener 
+    COMPONENT 
+        remote_service_admin
+)

@@ -14,35 +14,31 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+celix_subproject(RSA_BUNDLES_REMOTE_SERVICE_ADMIN_HTTP "Option to enable building the Remote Service Admin Service HTTP bundle" OFF DEPS LAUNCHER topology_manager remote_service_admin)
+if (RSA_BUNDLES_REMOTE_SERVICE_ADMIN_HTTP)
+	find_package(APR REQUIRED)
+	find_package(CURL REQUIRED)
 
-find_package(APR REQUIRED)
-find_package(CURL REQUIRED)
+	include_directories(${CURL_INCLUDE_DIRS})
+	include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/utils/public/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/private/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin_http/private/include")
+	include_directories("${PROJECT_SOURCE_DIR}/remote_services/endpoint_listener/public/include")
 
-include_directories(${CURL_INCLUDE_DIRS})
-include_directories("${PROJECT_SOURCE_DIR}/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/utils/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/public/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin/private/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/remote_service_admin_http/private/include")
-include_directories("${PROJECT_SOURCE_DIR}/remote_services/endpoint_listener/public/include")
+	SET_HEADER(BUNDLE_SYMBOLICNAME "apache_celix_remote_service_admin_http")
+	SET_HEADERS("Bundle-Name: Apache Celix Remote Service Admin HTTP")
 
-SET_HEADER(BUNDLE_SYMBOLICNAME "apache_celix_remote_service_admin")
-SET_HEADERS("Bundle-Name: Apache Celix Remote Service Admin")
-
-bundle(remote_service_admin SOURCES 
-	private/src/remote_service_admin_impl
-	private/src/export_registration_impl
-	private/src/import_registration_impl
-	private/src/remote_service_admin_activator
-	private/src/civetweb.c
-)
+	bundle(remote_service_admin_http SOURCES 
+		private/src/remote_service_admin_impl
+		private/src/export_registration_impl
+		private/src/import_registration_impl
+		private/src/remote_service_admin_activator
+		private/src/civetweb.c
+	)
     
-install_bundle(remote_service_admin
-	HEADERS
-	    public/include/remote_endpoint_impl.h
-		public/include/remote_endpoint.h
-		public/include/remote_proxy.h
-		public/include/remote_service_admin.h
-)
+	install_bundle(remote_service_admin_http)
 
-target_link_libraries(remote_service_admin celix_framework ${APRUTIL_LIBRARY} ${CURL_LIBRARIES})
+	target_link_libraries(remote_service_admin_http celix_framework ${APRUTIL_LIBRARY} ${CURL_LIBRARIES})
+endif (RSA_BUNDLES_REMOTE_SERVICE_ADMIN_HTTP)

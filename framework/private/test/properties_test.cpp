@@ -63,13 +63,17 @@ TEST(properties, create) {
 TEST(properties, load) {
 	char propertiesFile[] = "../../celix/framework/private/resources-test/properties.txt";
 	properties_pt properties = properties_load(propertiesFile);
-	LONGS_EQUAL(2, hashMap_size(properties));
+	LONGS_EQUAL(4, hashMap_size(properties));
 
 	char keyA[] = "a";
 	char *valueA = properties_get(properties, keyA);
 	STRCMP_EQUAL("b", valueA);
 	char keyB[] = "b";
 	STRCMP_EQUAL("c", properties_get(properties, keyB));
+	char keyAB[] = "a=b";
+	STRCMP_EQUAL("c", properties_get(properties, keyAB));
+	char keyABC[] = "a=b=c";
+	STRCMP_EQUAL("d", properties_get(properties, keyABC));
 }
 
 TEST(properties, store) {
